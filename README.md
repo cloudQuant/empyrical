@@ -1,8 +1,10 @@
-[![Build Status](https://travis-ci.org/quantopian/empyrical.svg?branch=master)](https://travis-ci.org/quantopian/empyrical)
-
-[![PyPI](https://img.shields.io/pypi/v/empyrical?color=%234ec726&style=flat-square)](https://pypi.org/project/empyrical/)
-
 # empyrical
+<p style="text-align: center;">
+    <img src="https://img.shields.io/badge/version-0.5.6-blueviolet.svg" alt="Version 0.5.6" style="margin-right: 10px;"/>
+    <img src="https://img.shields.io/badge/platform-mac%7Clinux%7Cwin-yellow.svg" alt="Supported Platforms: Mac, Linux, and Windows" style="margin-right: 10px;"/>
+    <img src="https://img.shields.io/badge/python-3.11%7C3.12-brightgreen.svg" alt="Build: Passing" style="margin-right: 10px;"/>
+    <img src="https://img.shields.io/badge/license-MIT-orange" alt="License: MIT"/>
+</p>
 
 Common financial risk metrics.
 
