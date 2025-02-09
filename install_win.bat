@@ -1,6 +1,6 @@
 @echo off
 :: 安装 requirements.txt 中的依赖
-pip install -U -r requirements.txt
+pip install -U -r ./empyrical/requirements.txt
 
 SET BUILD_DIR=build
 SET EGG_INFO_DIR=empyrical.egg-info

@@ -5,11 +5,13 @@ BUILD_DIR="build"
 EGG_INFO_DIR="empyrical.egg-info"
 BENCHMARKS_DIR=".benchmarks"
 
-# 安装 requirements.txt 中的依赖
-pip install -U -r requirements.txt
+
 
 # 切换到上一级目录
 cd ..
+
+# 安装 requirements.txt 中的依赖
+pip install -U -r ./empyrical/requirements.txt
 
 # 安装 empyrical 包
 pip install -U --no-build-isolation ./empyrical
