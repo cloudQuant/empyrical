@@ -12,10 +12,20 @@ Common financial risk metrics.
 - [Usage](#usage)
 - [Support](#support)
 - [Contributing](#contributing)
-- [Testing](#testing)
+
 
 ## Installation
 ```
+# new version
+git clone https://gitee.com/yunjinqi/empyrical    # user in China
+git clone https://github.com/cloudQuant/empyrical  # user not in China
+
+cd empyrical
+
+install_win.bat  # user use win
+sh install_unix.sh  # user use linux or macos
+
+# old version
 pip install empyrical
 ```
 
@@ -100,11 +110,4 @@ patches to the Yahoo or Google Finance API:
 
 Please contribute using [Github Flow](https://guides.github.com/introduction/flow/). Create a branch, add commits, and [open a pull request](https://github.com/quantopian/empyrical/compare/).
 
-## Testing
-- install requirements
-  - "nose>=1.3.7",
-  - "parameterized>=0.6.1"
 
-```
-./runtests.py
-```

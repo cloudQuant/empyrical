@@ -7,7 +7,7 @@ def perf_attrib(returns,
                 factor_returns,
                 factor_loadings):
     """
-    Attributes the performance of a returns stream to a set of risk factors.
+    Attributes the performance of a `returns` stream to a set of risk factors.
 
     Performance attribution determines how much each risk factor, e.g.,
     momentum, the technology sector, etc., contributed to total returns, as
@@ -22,20 +22,20 @@ def perf_attrib(returns,
     returns : pd.Series
         Returns for each day in the date range.
         - Example:
-            2017-01-01   -0.017098
-            2017-01-02    0.002683
-            2017-01-03   -0.008669
+            2017-01-01 -0.017098
+            2017-01-02 0.002683
+            2017-01-03 -0.008669
 
     positions: pd.Series
         Daily holdings in percentages, indexed by date.
         - Examples:
             dt          ticker
-            2017-01-01  AAPL      0.417582
-                        TLT       0.010989
-                        XOM       0.571429
-            2017-01-02  AAPL      0.202381
-                        TLT       0.535714
-                        XOM       0.261905
+            2017-01-01 AAPL 0.417582
+                        TLT 0.010989
+                        XOM 0.571429
+            2017-01-02 AAPL 0.202381
+                        TLT 0.535714
+                        XOM 0.261905
 
     factor_returns : pd.DataFrame
         Returns by factor, with date as index and factors as columns
@@ -66,17 +66,17 @@ def perf_attrib(returns,
         - Example:
                         momentum  reversal
             dt
-            2017-01-01 -0.238655  0.077123
-            2017-01-02  0.821872  1.520515
+            2017-01-01 -0.238655 0.077123
+            2017-01-02 0.821872 1.520515
 
     perf_attribution : pd.DataFrame
         df with factors, common returns, and specific returns as columns,
         and datetimes as index
         - Example:
-                        momentum  reversal  common_returns  specific_returns
+                        momentum  reversal common_returns specific_returns
             dt
-            2017-01-01  0.249087  0.935925        1.185012          1.185012
-            2017-01-02 -0.003194 -0.400786       -0.403980         -0.403980
+            2017-01-01 0.249087 0.935925 1.185012 1.185012
+            2017-01-02 -0.003194 -0.400786 -0.403980 -0.403980
 
     Note
     ----
@@ -127,12 +127,12 @@ def compute_exposures(positions, factor_loadings):
         A series of holdings as percentages indexed by date and ticker.
         - Examples:
             dt          ticker
-            2017-01-01  AAPL      0.417582
-                        TLT       0.010989
-                        XOM       0.571429
-            2017-01-02  AAPL      0.202381
-                        TLT       0.535714
-                        XOM       0.261905
+            2017-01-01 AAPL 0.417582
+                        TLT 0.010989
+                        XOM 0.571429
+            2017-01-02 AAPL 0.202381
+                        TLT 0.535714
+                        XOM 0.261905
 
     factor_loadings : pd.DataFrame
         Factor loadings for all days in the date range, with date and ticker as
@@ -154,8 +154,8 @@ def compute_exposures(positions, factor_loadings):
         - Example:
                         momentum  reversal
             dt
-            2017-01-01 -0.238655  0.077123
-            2017-01-02  0.821872  1.520515
+            2017-01-01 -0.238655 0.077123
+            2017-01-02 0.821872 1.520515
     """
     risk_exposures = factor_loadings.multiply(positions, axis='rows')
     return risk_exposures.groupby(level='dt').sum()

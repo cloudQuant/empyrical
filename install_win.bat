@@ -9,7 +9,7 @@ SET BENCHMARKS_DIR=.benchmarks
 :: 切换到脚本所在目录的上一级目录，确保相对路径正确
 cd /d "%~dp0.."
 
-:: 安装 bt_api_py 包
+:: 安装 empyrical 包
 :: pip install -U --no-build-isolation ./empyrical
 pip install -U ./empyrical
 

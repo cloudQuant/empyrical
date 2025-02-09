@@ -83,12 +83,12 @@ def roll(*args, **kwargs):
     ----------
     :returns: pd.Series or np.ndarray
         Daily returns of the strategy, noncumulative.
-        - See full explanation in :func:`~empyrical.stats.cum_returns`.
-    factor_returns (optional): float / series
+        - See full explanation in: func:`~empyrical.stats.cum_returns`.
+    :factor_returns: float / series
         Benchmark return to compare returns against.
     function:
         the function to run for each rolling window.
-    window (keyword): int
+    Window (keyword): int
         the number of periods included in each calculation.
     (other keywords): other keywords that are required to be passed to the
         function in the 'function' argument may also be passed in.
@@ -100,7 +100,7 @@ def roll(*args, **kwargs):
         ndarray(s) ==> ndarray
         Series(s) ==> pd.Series
 
-        A Series or ndarray of the results of the stat across the rolling
+        A Series or ndarray of the results, which is the stat across the rolling
         window.
 
     """
@@ -126,7 +126,7 @@ def up(returns, factor_returns, **kwargs):
     ----------
     returns : pd.Series or np.ndarray
         Daily returns of the strategy, noncumulative.
-        - See full explanation in :func:`~empyrical.stats.cum_returns`.
+        - See full explanation in: func:`~empyrical.stats.cum_returns`.
     factor_returns: float / series
         Benchmark return to compare returns against.
     :function:
@@ -152,7 +152,7 @@ def down(returns, factor_returns, **kwargs):
     ----------
     returns : pd.Series or np.ndarray
         Daily returns of the strategy, noncumulative.
-        - See full explanation in :func:`~empyrical.stats.cum_returns`.
+        - See full explanation in: func:`~empyrical.stats.cum_returns`.
     factor_returns: float / series
         Benchmark return to compare returns against.
     :function:
@@ -190,13 +190,13 @@ def _roll_pandas(func, window, *args, **kwargs):
 
 
 @deprecated(msg=DATAREADER_DEPRECATION_WARNING)
-def cache_dir(environ=environ):
+def cache_dir(environ_=environ):
     try:
-        return environ['EMPYRICAL_CACHE_DIR']
+        return environ_['EMPYRICAL_CACHE_DIR']
     except KeyError:
         return join(
 
-            environ.get(
+            environ_.get(
                 'XDG_CACHE_HOME',
                 expanduser('~/.cache/'),
             ),
@@ -288,18 +288,18 @@ def get_returns_cached(filepath, update_func, latest_dt, **kwargs):
     filepath : str
         Path to cached csv file
     update_func : function
-        Function to call in case cache is not up-to-date.
+        Function to call in case cache is not up-to-dated.
     latest_dt : pd.Timestamp (tz=UTC)
         Latest datetime required in csv file.
     **kwargs : Keyword arguments
         Optional keyword arguments will be passed to update_func()
     Returns
     -------
-    pandas.DataFrame
-        DataFrame containing returns
+    pandas.DataFrame containing returns
     """
 
     update_cache = False
+    returns = None
 
     try:
         mtime = getmtime(filepath)
@@ -350,7 +350,7 @@ def load_portfolio_risk_factors(filepath_prefix=None, start=None, end=None):
     """
     Load risk factors Mkt-Rf, SMB, HML, Rf, and UMD.
     Data is stored in HDF5 file. If the data is more than 2
-    days old, redownload from Dartmouth.
+    days old, re-download from Dartmouth.
     Returns
     -------
     five_factors : pd.DataFrame
@@ -382,14 +382,13 @@ def get_treasury_yield(start=None, end=None, period='3MO'):
 
     Parameters
     ----------
-    start : date, optional
+    :param start : date, optional
         Earliest date to fetch data for.
-        Defaults to earliest date available.
-    end : date, optional
+        Defaults to the earliest date available.
+    :param end : Date, optional
         Latest date to fetch data for.
-        Defaults to latest date available.
-    period : {'1MO', '3MO', '6MO', 1', '5', '10'}, optional
-        Which maturity to use.
+        Defaults to the latest date available.
+    :param period: {'1MO', '3MO', '6MO', 1', '5', '10'}, optional, Which maturity to use.
     Returns
     -------
     pd.Series
@@ -421,14 +420,14 @@ def get_symbol_returns_from_yahoo(symbol, start=None, end=None):
     symbol : str
         Symbol name to load, e.g. 'SPY'
     start : pandas.Timestamp compatible, optional
-        Start date of time period to retrieve
+        Start date of the time period to retrieve
     end : pandas.Timestamp compatible, optional
-        End date of time period to retrieve
+        End date of the time period to retrieve
 
     Returns
     -------
     pandas.DataFrame
-        Returns of symbol in requested period.
+        Returns of symbol in the requested period.
     """
 
     try:
@@ -457,13 +456,13 @@ def default_returns_func(symbol, start=None, end=None):
     Parameters
     ----------
     symbol : str
-        Ticker symbol, e.g. APPL.
+        Ticker symbol, e.g., APPL.
     start : date, optional
         Earliest date to fetch data for.
-        Defaults to earliest date available.
+        Defaults to the earliest date available.
     end : date, optional
         Latest date to fetch data for.
-        Defaults to latest date available.
+        Defaults to the latest date available.
 
     Returns
     -------
@@ -501,13 +500,13 @@ def rolling_window(array, length, mutable=False):
 
         (X_0, ... X_N)
 
-    into an array of shape
+    Into an array of shape
 
         (length, X_0 - length + 1, ... X_N)
 
-    where each slice at index i along the first axis is equivalent to
+    Where each slice at index i along the first axis is equivalent to
 
-        result[i] = array[length * i:length * (i + 1)]
+        Result[i] = array[length * i:length * (i + 1)]
 
     Parameters
     ----------
@@ -530,7 +529,7 @@ def rolling_window(array, length, mutable=False):
     -------
     >>> from numpy import arange
     >>> a = arange(25).reshape(5, 5)
-    >>> a
+    >>> print(a)
     array([[ 0,  1,  2,  3,  4],
            [ 5,  6,  7,  8,  9],
            [10, 11, 12, 13, 14],

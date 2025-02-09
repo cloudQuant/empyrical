@@ -2,7 +2,7 @@
 
 # 定义变量
 BUILD_DIR="build"
-EGG_INFO_DIR="pyfolio.egg-info"
+EGG_INFO_DIR="empyrical.egg-info"
 BENCHMARKS_DIR=".benchmarks"
 
 # 安装 requirements.txt 中的依赖
@@ -11,14 +11,16 @@ pip install -U -r requirements.txt
 # 切换到上一级目录
 cd ..
 
-# 安装 bt_api_py 包
-pip install -U --no-build-isolation ./bt_api_py
+# 安装 empyrical 包
+pip install -U --no-build-isolation ./empyrical
 
-# 切换到 bt_api_py 目录
-cd ./pyfolio
+# 运行 empyrical 的测试用例，使用 4 个进程并行测试
+pytest ./empyrical/tests -n 4
 
-# 运行 backtrader 的测试用例，使用 4 个进程并行测试
-pytest tests -n 4
+# 切换到 empyrical 目录
+cd ./empyrical
+
+
 
 # 删除中间构建和 egg-info 目录
 echo "Deleting intermediate files..."
