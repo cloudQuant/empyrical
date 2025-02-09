@@ -1,0 +1,7 @@
+nose
+scipy
+numpy==1.26.4
+pandas
+pandas-datareader
+six
+parameterized
