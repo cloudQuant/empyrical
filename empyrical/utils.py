@@ -81,7 +81,7 @@ def roll(*args, **kwargs):
 
     Parameters
     ----------
-    returns : pd.Series or np.ndarray
+    :returns: pd.Series or np.ndarray
         Daily returns of the strategy, noncumulative.
         - See full explanation in :func:`~empyrical.stats.cum_returns`.
     factor_returns (optional): float / series
@@ -127,9 +127,9 @@ def up(returns, factor_returns, **kwargs):
     returns : pd.Series or np.ndarray
         Daily returns of the strategy, noncumulative.
         - See full explanation in :func:`~empyrical.stats.cum_returns`.
-    factor_returns (optional): float / series
+    factor_returns: float / series
         Benchmark return to compare returns against.
-    function:
+    :function:
         the function to run for each rolling window.
     (other keywords): other keywords that are required to be passed to the
         function in the 'function' argument may also be passed in.
@@ -153,9 +153,9 @@ def down(returns, factor_returns, **kwargs):
     returns : pd.Series or np.ndarray
         Daily returns of the strategy, noncumulative.
         - See full explanation in :func:`~empyrical.stats.cum_returns`.
-    factor_returns (optional): float / series
+    factor_returns: float / series
         Benchmark return to compare returns against.
-    function:
+    :function:
         the function to run for each rolling window.
     (other keywords): other keywords that are required to be passed to the
         function in the 'function' argument may also be passed in.

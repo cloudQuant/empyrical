@@ -5,3 +5,4 @@ pandas
 pandas-datareader
 six
 parameterized
+bottleneck
