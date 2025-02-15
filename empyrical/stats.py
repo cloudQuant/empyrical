@@ -1637,7 +1637,8 @@ Tail Risks: Application to Stress Testing`
     # exclude any rows where returns are nan
     pairs = pairs.dropna()
     # sort by beta
-    pairs = pairs.sort_values(by='factor_returns')
+    # pairs = pairs.sort_values(by='factor_returns') #fix bugs about the value is not the same in win and linux
+    pairs = pairs.sort_values(by=['factor_returns'], kind='mergesort')
 
     # find the three vectors, using median of 3
     start_index = 0
