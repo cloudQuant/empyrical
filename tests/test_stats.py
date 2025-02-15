@@ -1067,7 +1067,7 @@ class TestStats(BaseTestCase):
     ])
     def test_beta_fragility_heuristic(self, returns, factor_returns, expected):
         actual_value = self.empyrical.beta_fragility_heuristic(returns, factor_returns)
-        print("actual_value", actual_value, "expected", expected)
+        # print("actual_value", actual_value, "expected", expected)
         assert_almost_equal(actual_value,
             expected,
             DECIMAL_PLACES)

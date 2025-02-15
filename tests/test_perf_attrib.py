@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 import unittest
-
 from empyrical.perf_attrib import perf_attrib
 
 
@@ -192,8 +191,8 @@ class PerfAttribTestCase(unittest.TestCase):
 
         # specific and common returns combined should equal total returns
         pd.testing.assert_series_equal(returns,
-                                            combined_returns,
-                                            check_names=False)
+                                       combined_returns,
+                                       check_names=False)
 
         # check that residuals + intercepts = specific returns
         self.assertTrue(np.isclose((residuals + intercepts), 0).all())
