@@ -1,10 +1,13 @@
 import numpy as np
 import pandas as pd
 import unittest
+import os
 from empyrical.perf_attrib import perf_attrib
 
 
 class PerfAttribTestCase(unittest.TestCase):
+    __location__ = os.path.realpath(
+        os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
     def test_perf_attrib_simple(self):
 
@@ -134,7 +137,7 @@ class PerfAttribTestCase(unittest.TestCase):
 
     def test_perf_attrib_regression(self):
 
-        positions = pd.read_csv('empyrical/tests/test_data/positions.csv',
+        positions = pd.read_csv(self.__location__ + '/test_data/positions.csv',
                                 index_col=0, parse_dates=True)
 
         positions.columns = [int(col) if col != 'cash' else col
@@ -144,28 +147,28 @@ class PerfAttribTestCase(unittest.TestCase):
                                      axis='rows')
         positions = positions.drop('cash', axis='columns').stack()
 
-        returns = pd.read_csv('empyrical/tests/test_data/returns.csv',
+        returns = pd.read_csv(self.__location__ + '/test_data/returns.csv',
                               index_col=0, parse_dates=True,
                               header=None)
         if returns.shape[1] == 1:
             returns = returns.iloc[:, 0]
 
         factor_loadings = pd.read_csv(
-            'empyrical/tests/test_data/factor_loadings.csv',
+            self.__location__ + '/test_data/factor_loadings.csv',
             index_col=[0, 1], parse_dates=True
         )
 
         factor_returns = pd.read_csv(
-            'empyrical/tests/test_data/factor_returns.csv',
+            self.__location__ + '/test_data/factor_returns.csv',
             index_col=0, parse_dates=True
         )
 
-        residuals = pd.read_csv('empyrical/tests/test_data/residuals.csv',
+        residuals = pd.read_csv(self.__location__ + '/test_data/residuals.csv',
                                 index_col=0, parse_dates=True)
 
         residuals.columns = [int(col) for col in residuals.columns]
 
-        intercepts = pd.read_csv('empyrical/tests/test_data/intercepts.csv',
+        intercepts = pd.read_csv(self.__location__ + '/test_data/intercepts.csv',
                                  index_col=0, header=None)
         if intercepts.shape[1] == 1:
             intercepts = intercepts.iloc[:, 0]
