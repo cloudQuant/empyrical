@@ -2,6 +2,7 @@
 
 <p align="center">
     <img src="https://img.shields.io/badge/version-0.6.0-blueviolet.svg" alt="Version 0.6.0" style="margin-right: 10px;"/>
+    <img src="https://github.com/cloudQuant/empyrical/workflows/Tests/badge.svg" alt="Tests" style="margin-right: 10px;"/>
     <img src="https://img.shields.io/badge/platform-mac%7Clinux%7Cwin-yellow.svg" alt="Supported Platforms: Mac, Linux, and Windows" style="margin-right: 10px;"/>
     <img src="https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-brightgreen.svg" alt="Python Versions" style="margin-right: 10px;"/>
     <img src="https://img.shields.io/badge/license-Apache%202.0-orange" alt="License: Apache 2.0"/>
