@@ -5,13 +5,11 @@ on:
     branches: [ master, main, develop ]
   pull_request:
     branches: [ master, main, develop ]
-  schedule:
-    # Run tests weekly on Monday at 00:00 UTC
-    - cron: '0 0 * * 1'
+  workflow_dispatch:
 
 jobs:
   test:
-    name: Test Python ${{ matrix.python-version }} on ${{ matrix.os }}
+    name: Test - ${{ matrix.os }} - Python ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
     
     strategy:
@@ -29,43 +27,89 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
         
-    - name: Display Python version
-      run: python -c "import sys; print(sys.version)"
-      
-    - name: Upgrade pip
+    - name: Display system info
+      run: |
+        python --version
+        pip --version
+        
+    - name: Upgrade pip and core packages
       run: |
         python -m pip install --upgrade pip setuptools wheel
         
-    - name: Install dependencies
+    - name: Install numpy first (required by other packages)
+      run: |
+        pip install "numpy>=1.17.0,<2.0"
+        
+    - name: Install dependencies from requirements.txt
       run: |
         pip install -r requirements.txt
+      continue-on-error: false
+        
+    - name: Install package in development mode
+      run: |
+        pip install -e .
+        
+    - name: Verify installation
+      run: |
+        python -c "import empyrical; print(f'Empyrical {empyrical.__version__} installed successfully')"
+        python -c "import pkg_resources; print('numpy:', pkg_resources.get_distribution('numpy').version)"
+        python -c "import pkg_resources; print('pandas:', pkg_resources.get_distribution('pandas').version)"
+        python -c "import pkg_resources; print('scipy:', pkg_resources.get_distribution('scipy').version)"
+        
+    - name: Run tests
+      run: |
+        python -m pytest tests/ -v --tb=short --no-header
+      env:
+        PYTHONWARNINGS: ignore
+        
+    - name: Upload test artifacts on failure
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-failure-${{ matrix.os }}-py${{ matrix.python-version }}
+        path: |
+          *.log
+          .pytest_cache/
+        retention-days: 7
+
+  quick-test:
+    name: Quick Test - Ubuntu - Python 3.11
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        
+    - name: Install core dependencies only
+      run: |
+        python -m pip install --upgrade pip setuptools wheel
+        pip install numpy pandas scipy pytest
         
     - name: Install package
       run: |
         pip install -e .
         
-    - name: Show installed packages
+    - name: Run basic tests
       run: |
-        pip list
-        
-    - name: Run tests
-      run: |
-        python -m pytest tests -v --tb=short
-      continue-on-error: false
-        
-    - name: Upload test results
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-results-${{ matrix.os }}-${{ matrix.python-version }}
-        path: |
-          *.log
-          test_results/
-        retention-days: 30
-
+        python -c "
+import empyrical
+import numpy as np
+# Test basic functionality
+returns = np.array([0.01, 0.02, -0.03, 0.04, -0.01])
+print(f'Sharpe ratio: {empyrical.sharpe_ratio(returns)}')
+print(f'Max drawdown: {empyrical.max_drawdown(returns)}')
+print('Basic tests passed!')
+"
+    
   coverage:
-    name: Code Coverage
+    name: Coverage - Ubuntu - Python 3.11
     runs-on: ubuntu-latest
+    needs: quick-test
     
     steps:
     - name: Checkout code
@@ -79,33 +123,25 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip setuptools wheel
+        pip install numpy
         pip install -r requirements.txt
-        pip install pytest-cov codecov
+        pip install pytest-cov
         pip install -e .
         
     - name: Run tests with coverage
       run: |
-        python -m pytest tests -v --cov=empyrical --cov-report=xml --cov-report=html --tb=short
+        python -m pytest tests/ --cov=empyrical --cov-report=xml --cov-report=term
       continue-on-error: true
         
-    - name: Upload coverage to Codecov
+    - name: Upload coverage reports
       uses: codecov/codecov-action@v4
       with:
         file: ./coverage.xml
-        flags: unittests
-        name: codecov-umbrella
         fail_ci_if_error: false
       continue-on-error: true
-        
-    - name: Upload coverage HTML report
-      uses: actions/upload-artifact@v4
-      with:
-        name: coverage-report
-        path: htmlcov/
-        retention-days: 30
 
   lint:
-    name: Code Quality Checks
+    name: Lint
     runs-on: ubuntu-latest
     
     steps:
@@ -124,14 +160,14 @@ jobs:
         
     - name: Run flake8
       run: |
-        # Stop the build if there are Python syntax errors or undefined names
-        flake8 empyrical --count --select=E9,F63,F7,F82 --show-source --statistics || true
-        # Exit-zero treats all errors as warnings
-        flake8 empyrical --count --exit-zero --max-complexity=20 --max-line-length=120 --statistics
+        # Check for syntax errors only
+        flake8 empyrical --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Full check with lenient settings
+        flake8 empyrical --count --exit-zero --max-complexity=20 --max-line-length=120 --statistics --exclude=__pycache__,build,dist
       continue-on-error: true
 
   build:
-    name: Build Distribution
+    name: Build
     runs-on: ubuntu-latest
     
     steps:
@@ -143,66 +179,28 @@ jobs:
       with:
         python-version: '3.11'
         
-    - name: Install build dependencies
+    - name: Install build tools
       run: |
         python -m pip install --upgrade pip
-        pip install build wheel setuptools
+        pip install build wheel setuptools twine
         
-    - name: Build distribution
+    - name: Build package
       run: |
         python -m build
         
-    - name: List distribution files
+    - name: Check package
       run: |
+        twine check dist/*
         ls -la dist/
         
-    - name: Check distribution
+    - name: Test installation
       run: |
-        pip install twine
-        twine check dist/* || true
-      continue-on-error: true
+        pip install dist/*.whl
+        python -c "import empyrical; print(f'Installed version: {empyrical.__version__}')"
         
-    - name: Upload distribution artifacts
+    - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: dist
         path: dist/
         retention-days: 30
-
-  minimal-test:
-    name: Minimal Test - Python ${{ matrix.python-version }}
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ['3.8', '3.11']
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
-        
-    - name: Install minimal dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install numpy pandas scipy pytest
-        pip install -e .
-        
-    - name: Run basic import test
-      run: |
-        python -c "import empyrical; print(f'Empyrical version: {empyrical.__version__}')"
-        
-    - name: Run simple calculation test
-      run: |
-        python -c "
-import numpy as np
-import empyrical
-returns = np.array([0.01, 0.02, -0.03, 0.04, -0.01])
-sharpe = empyrical.sharpe_ratio(returns)
-print(f'Sharpe ratio: {sharpe}')
-mdd = empyrical.max_drawdown(returns)
-print(f'Max drawdown: {mdd}')
-"

@@ -35,17 +35,38 @@ LICENSE = "Apache License, Version 2.0"
 classifiers = [
     "Development Status :: 4 - Beta",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 2",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 2.7",
-    "Programming Language :: Python :: 3.4",
-    "Programming Language :: Python :: 3.5",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "License :: OSI Approved :: Apache Software License",
     "Intended Audience :: Science/Research",
     "Topic :: Scientific/Engineering",
     "Topic :: Scientific/Engineering :: Mathematics",
     "Operating System :: OS Independent"
 ]
+
+install_requires = [
+    "numpy>=1.17.0",
+    "pandas>=0.25.0",
+    "scipy>=1.3.0",
+    "six>=1.10",
+]
+
+extras_require = {
+    "dev": [
+        "pytest>=6.0",
+        "pytest-xdist>=2.0",
+        "pytest-cov>=2.10",
+        "flake8",
+    ],
+    "datareader": [
+        "pandas-datareader>=0.8.0",
+    ],
+}
 
 if __name__ == "__main__":
     setup(
@@ -58,5 +79,8 @@ if __name__ == "__main__":
         url=URL,
         long_description=LONG_DESCRIPTION,
         packages=["empyrical"],
-        classifiers=classifiers
+        classifiers=classifiers,
+        install_requires=install_requires,
+        extras_require=extras_require,
+        python_requires=">=3.8",
     )
