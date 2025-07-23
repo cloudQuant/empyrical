@@ -1,0 +1,75 @@
+name: Debug Tests
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ debug-ci ]
+
+jobs:
+  debug-test:
+    name: Debug Test - ${{ matrix.os }} - Python ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ['3.11']
+        
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+        
+    - name: System information
+      run: |
+        echo "=== System Information ==="
+        python --version
+        pip --version
+        echo "=== Working Directory ==="
+        pwd
+        echo "=== Directory Contents ==="
+        ls -la
+        echo "=== Test Directory ==="
+        ls -la tests/ || echo "tests/ directory not found"
+        echo "=== Package Directory ==="
+        ls -la empyrical/ || echo "empyrical/ directory not found"
+        
+    - name: Install minimal dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install numpy pandas scipy pytest
+        
+    - name: Install package
+      run: |
+        pip install -e .
+        echo "=== Installed Packages ==="
+        pip list
+        
+    - name: Test import
+      run: |
+        echo "=== Testing Import ==="
+        python -c "import empyrical; print('Successfully imported empyrical')"
+        python -c "import empyrical; print(f'Version: {empyrical.__version__}')"
+        python -c "import empyrical; print(f'Available functions: {dir(empyrical)[:10]}...')"
+        
+    - name: Find test files
+      run: |
+        echo "=== Finding Test Files ==="
+        find . -name "test_*.py" -type f | head -20
+        echo "=== Pytest Collection ==="
+        python -m pytest --collect-only tests/ || echo "pytest collection failed"
+        
+    - name: Run single test
+      run: |
+        echo "=== Running Single Test ==="
+        python -m pytest tests/test_stats.py::test_sharpe_ratio -v || echo "Single test failed"
+        
+    - name: Run all tests with verbose output
+      run: |
+        echo "=== Running All Tests ==="
+        python -m pytest tests/ -v -s --tb=long || echo "Tests failed with exit code $?"
