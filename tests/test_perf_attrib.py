@@ -150,10 +150,20 @@ class PerfAttribTestCase(unittest.TestCase):
         if returns.shape[1] == 1:
             returns = returns.iloc[:, 0]
 
-        factor_loadings = pd.read_csv(
-            os.path.join(current_dir, 'test_data', 'factor_loadings.csv'),
-            index_col=[0, 1], parse_dates=True
-        )
+        # date_format parameter was added in pandas 2.0
+        read_csv_kwargs = {'index_col': [0, 1], 'parse_dates': True}
+        try:
+            # Try with date_format for newer pandas
+            factor_loadings = pd.read_csv(
+                os.path.join(current_dir, 'test_data', 'factor_loadings.csv'),
+                date_format='ISO8601', **read_csv_kwargs
+            )
+        except TypeError:
+            # Fall back without date_format for older pandas
+            factor_loadings = pd.read_csv(
+                os.path.join(current_dir, 'test_data', 'factor_loadings.csv'),
+                **read_csv_kwargs
+            )
 
         factor_returns = pd.read_csv(
             os.path.join(current_dir, 'test_data', 'factor_returns.csv'),

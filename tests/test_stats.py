@@ -24,6 +24,17 @@ import pytest
 
 DECIMAL_PLACES = 8
 
+# Pandas frequency alias compatibility
+# pandas >= 2.2 deprecated 'M' and 'A' in favor of 'ME' and 'YE'
+try:
+    # Try using new frequency aliases
+    pd.date_range('2000-1-1', periods=1, freq='ME')
+    MONTH_FREQ = 'ME'
+    YEAR_FREQ = 'YE'
+except ValueError:
+    # Fall back to old aliases for older pandas versions
+    MONTH_FREQ = 'M'
+    YEAR_FREQ = 'A'
 
 rand = np.random.RandomState(1337)
 
@@ -83,7 +94,7 @@ class TestStats(BaseTestCase):
     # Monthly returns
     monthly_returns = pd.Series(
         np.array([0., 1., 10., -4., 2., 3., 2., 1., -10.])/100,
-        index=pd.date_range('2000-1-30', periods=9, freq='ME'))
+        index=pd.date_range('2000-1-30', periods=9, freq=MONTH_FREQ))
 
     # Series of length 1
     one_return = pd.Series(
@@ -147,7 +158,7 @@ class TestStats(BaseTestCase):
 
     df_index_simple = pd.date_range('2000-1-30', periods=8, freq='D')
     df_index_week = pd.date_range('2000-1-30', periods=8, freq='W')
-    df_index_month = pd.date_range('2000-1-30', periods=8, freq='ME')
+    df_index_month = pd.date_range('2000-1-30', periods=8, freq=MONTH_FREQ)
 
     df_simple = pd.DataFrame({
         'one': pd.Series(one, index=df_index_simple),
@@ -188,15 +199,15 @@ class TestStats(BaseTestCase):
         )
         for i in range(returns.size):
             assert_almost_equal(
-                cum_returns[i],
-                expected[i],
+                cum_returns.iloc[i] if hasattr(cum_returns, 'iloc') else cum_returns[i],
+                expected[i] if isinstance(expected, list) else expected.iloc[i],
                 4)
 
         self.assert_indexes_match(cum_returns, returns)
 
     @parameterized.expand([
         (empty_returns, 0, np.nan),
-        (one_return, 0, one_return[0]),
+        (one_return, 0, one_return.iloc[0]),
         (mixed_returns, 0, 0.03893),
         (mixed_returns, 100, 103.89310),
         (negative_returns, 0, -0.36590)
@@ -493,8 +504,8 @@ class TestStats(BaseTestCase):
         else:
             for i in range(downside_risk.size):
                 assert_almost_equal(
-                    downside_risk[i],
-                    expected[i],
+                    downside_risk.iloc[i] if hasattr(downside_risk, 'iloc') else downside_risk[i],
+                    expected.iloc[i] if hasattr(expected, 'iloc') else expected[i],
                     DECIMAL_PLACES)
 
     # As a higher percentage of returns are below the required return,
@@ -588,8 +599,8 @@ class TestStats(BaseTestCase):
         else:
             for i in range(sortino_ratio.size):
                 assert_almost_equal(
-                    sortino_ratio[i],
-                    expected[i],
+                    sortino_ratio.iloc[i] if hasattr(sortino_ratio, 'iloc') else sortino_ratio[i],
+                    expected.iloc[i] if hasattr(expected, 'iloc') else expected[i],
                     DECIMAL_PLACES)
 
     # A large Sortino ratio indicates there is a low probability of a large
@@ -762,7 +773,7 @@ class TestStats(BaseTestCase):
         (mixed_returns, -mixed_returns, 0.0),
     ])
     def test_alpha(self, returns, benchmark, expected):
-        if np.all(benchmark == benchmark[0]):
+        if np.all(benchmark == benchmark.iloc[0]):
             pytest.skip("Skipping test because x values are identical")
         observed = self.empyrical.alpha(returns, benchmark)
         assert_almost_equal(
@@ -1007,7 +1018,7 @@ class TestStats(BaseTestCase):
         (flat_line_1_tz, empyrical.DAILY, 11.274002099240256),
         (pd.Series(np.array(
             [3., 3., 3.])/100,
-            index=pd.date_range('2000-1-30', periods=3, freq='YE')
+            index=pd.date_range('2000-1-30', periods=3, freq=YEAR_FREQ)
         ), 'yearly', 0.03)
     ])
     def test_cagr(self, returns, period, expected):
@@ -1455,11 +1466,11 @@ class TestHelpers(BaseTestCase):
 
         self.returns = pd.Series(
             rand.randn(1, 120)[0]/100.,
-            index=pd.date_range('2000-1-30', periods=120, freq='ME'))
+            index=pd.date_range('2000-1-30', periods=120, freq=MONTH_FREQ))
 
         self.factor_returns = pd.Series(
             rand.randn(1, 120)[0]/100.,
-            index=pd.date_range('2000-1-30', periods=120, freq='ME'))
+            index=pd.date_range('2000-1-30', periods=120, freq=MONTH_FREQ))
 
     def test_roll_pandas(self):
         res = emutils.roll(self.returns,

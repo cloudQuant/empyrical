@@ -211,7 +211,9 @@ def simple_returns(prices):
     else:
         # Assume np.ndarray
         out = np.diff(prices, axis=0)
-        np.divide(out, prices[:-1], out=out)
+        # Avoid division by zero warning
+        with np.errstate(divide='ignore', invalid='ignore'):
+            np.divide(out, prices[:-1], out=out)
 
     return out
 
@@ -704,15 +706,21 @@ def sharpe_ratio(returns,
     returns_risk_adj = np.asanyarray(_adjust_returns(returns, risk_free))
     ann_factor = annualization_factor(period, annualization)
 
-    np.multiply(
-        np.divide(
-            nanmean(returns_risk_adj, axis=0),
-            nanstd(returns_risk_adj, ddof=1, axis=0),
+    # Handle division by zero
+    std_returns = nanstd(returns_risk_adj, ddof=1, axis=0)
+    mean_returns = nanmean(returns_risk_adj, axis=0)
+    
+    # Avoid division by zero warning
+    with np.errstate(divide='ignore', invalid='ignore'):
+        np.multiply(
+            np.divide(
+                mean_returns,
+                std_returns,
+                out=out,
+            ),
+            np.sqrt(ann_factor),
             out=out,
-        ),
-        np.sqrt(ann_factor),
-        out=out,
-    )
+        )
     if return_1d:
         out = out.item()
 
@@ -794,7 +802,9 @@ def sortino_ratio(returns,
         if _downside_risk is not None else
         downside_risk(returns, required_return, period, annualization)
     )
-    np.divide(average_annual_return, annualized_downside_risk, out=out)
+    # Avoid division by zero warning
+    with np.errstate(divide='ignore', invalid='ignore'):
+        np.divide(average_annual_return, annualized_downside_risk, out=out)
     if return_1d:
         out = out.item()
     elif isinstance(returns, pd.DataFrame):
@@ -929,11 +939,13 @@ def excess_sharpe(returns, factor_returns, out=None):
     active_return = _adjust_returns(returns, factor_returns)
     tracking_error = np.nan_to_num(nanstd(active_return, ddof=1, axis=0))
 
-    out = np.divide(
-        nanmean(active_return, axis=0, out=out),
-        tracking_error,
-        out=out,
-    )
+    # Avoid division by zero warning
+    with np.errstate(divide='ignore', invalid='ignore'):
+        out = np.divide(
+            nanmean(active_return, axis=0, out=out),
+            tracking_error,
+            out=out,
+        )
     if returns_1d:
         out = out.item()
     return out

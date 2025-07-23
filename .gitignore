@@ -33,8 +33,10 @@ var/
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
+empyrical.egg-info/
 
 # Unit test / coverage reports
+test_results/
 htmlcov/
 .tox/
 .coverage
@@ -44,6 +46,7 @@ nosetests.xml
 coverage.xml
 *,cover
 .hypothesis/
+.pytest_cache/
 
 # Translations
 *.mo
