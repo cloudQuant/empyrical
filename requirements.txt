@@ -1,8 +1,14 @@
 nose
 scipy
-numpy==1.26.4
+numpy
 pandas
 pandas-datareader
 six
 parameterized
 bottleneck
+pytest
+pytest-benchmark
+pytest-sugar
+pytest-cov
+pytest-picked
+pytest-xdist

@@ -1,0 +1,24 @@
+Empyrical Test Summary 
+Tested on: 2025/07/23 ÖÜÈý 17:34:48.71 
+ 
+py37: PASSED - !pyver! 
+================ 690 passed, 45 skipped, 51 warnings in 11.52s ================
+ 
+py38: PASSED - !pyver! 
+================ 690 passed, 45 skipped, 45 warnings in 12.29s ================
+ 
+py39: PASSED - !pyver! 
+=============== 690 passed, 45 skipped, 112 warnings in 14.70s ================
+ 
+py310: PASSED - !pyver! 
+=============== 690 passed, 45 skipped, 112 warnings in 14.37s ================
+ 
+py311: PASSED - !pyver! 
+=============== 690 passed, 45 skipped, 106 warnings in 13.63s ================
+ 
+py312: PASSED - !pyver! 
+=============== 690 passed, 45 skipped, 106 warnings in 12.85s ================
+ 
+py313: PASSED - !pyver! 
+=============== 690 passed, 45 skipped, 106 warnings in 13.19s ================
+ 

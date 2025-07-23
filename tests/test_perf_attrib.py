@@ -1,3 +1,4 @@
+import os 
 import numpy as np
 import pandas as pd
 import unittest
@@ -131,10 +132,9 @@ class PerfAttribTestCase(unittest.TestCase):
 
         expected_exposures_portfolio.equals(exposures_portfolio)
 
-
     def test_perf_attrib_regression(self):
-
-        positions = pd.read_csv('empyrical/tests/test_data/positions.csv',
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        positions = pd.read_csv(os.path.join(current_dir, 'test_data', 'positions.csv'),
                                 index_col=0, parse_dates=True)
 
         positions.columns = [int(col) if col != 'cash' else col
@@ -144,28 +144,28 @@ class PerfAttribTestCase(unittest.TestCase):
                                      axis='rows')
         positions = positions.drop('cash', axis='columns').stack()
 
-        returns = pd.read_csv('empyrical/tests/test_data/returns.csv',
+        returns = pd.read_csv(os.path.join(current_dir, 'test_data', 'returns.csv'),
                               index_col=0, parse_dates=True,
                               header=None)
         if returns.shape[1] == 1:
             returns = returns.iloc[:, 0]
 
         factor_loadings = pd.read_csv(
-            'empyrical/tests/test_data/factor_loadings.csv',
+            os.path.join(current_dir, 'test_data', 'factor_loadings.csv'),
             index_col=[0, 1], parse_dates=True
         )
 
         factor_returns = pd.read_csv(
-            'empyrical/tests/test_data/factor_returns.csv',
+            os.path.join(current_dir, 'test_data', 'factor_returns.csv'),
             index_col=0, parse_dates=True
         )
 
-        residuals = pd.read_csv('empyrical/tests/test_data/residuals.csv',
+        residuals = pd.read_csv(os.path.join(current_dir, 'test_data', 'residuals.csv'),
                                 index_col=0, parse_dates=True)
 
         residuals.columns = [int(col) for col in residuals.columns]
 
-        intercepts = pd.read_csv('empyrical/tests/test_data/intercepts.csv',
+        intercepts = pd.read_csv(os.path.join(current_dir, 'test_data', 'intercepts.csv'),
                                  index_col=0, header=None)
         if intercepts.shape[1] == 1:
             intercepts = intercepts.iloc[:, 0]
@@ -184,8 +184,8 @@ class PerfAttribTestCase(unittest.TestCase):
         # since all returns are factor returns, common returns should be
         # equivalent to total returns, and specific returns should be 0
         pd.testing.assert_series_equal(returns,
-                                            common_returns,
-                                            check_names=False)
+                                       common_returns,
+                                       check_names=False)
 
         self.assertTrue(np.isclose(specific_returns, 0).all())
 
@@ -203,8 +203,8 @@ class PerfAttribTestCase(unittest.TestCase):
         ).sum(axis='columns')
 
         pd.testing.assert_series_equal(expected_common_returns,
-                                            common_returns,
-                                            check_names=False)
+                                       common_returns,
+                                       check_names=False)
 
         # since factor loadings are ones, portfolio risk exposures
         # should be ones

@@ -83,7 +83,7 @@ class TestStats(BaseTestCase):
     # Monthly returns
     monthly_returns = pd.Series(
         np.array([0., 1., 10., -4., 2., 3., 2., 1., -10.])/100,
-        index=pd.date_range('2000-1-30', periods=9, freq='M'))
+        index=pd.date_range('2000-1-30', periods=9, freq='ME'))
 
     # Series of length 1
     one_return = pd.Series(
@@ -147,7 +147,7 @@ class TestStats(BaseTestCase):
 
     df_index_simple = pd.date_range('2000-1-30', periods=8, freq='D')
     df_index_week = pd.date_range('2000-1-30', periods=8, freq='W')
-    df_index_month = pd.date_range('2000-1-30', periods=8, freq='M')
+    df_index_month = pd.date_range('2000-1-30', periods=8, freq='ME')
 
     df_simple = pd.DataFrame({
         'one': pd.Series(one, index=df_index_simple),
@@ -1007,7 +1007,7 @@ class TestStats(BaseTestCase):
         (flat_line_1_tz, empyrical.DAILY, 11.274002099240256),
         (pd.Series(np.array(
             [3., 3., 3.])/100,
-            index=pd.date_range('2000-1-30', periods=3, freq='A')
+            index=pd.date_range('2000-1-30', periods=3, freq='YE')
         ), 'yearly', 0.03)
     ])
     def test_cagr(self, returns, period, expected):
@@ -1455,11 +1455,11 @@ class TestHelpers(BaseTestCase):
 
         self.returns = pd.Series(
             rand.randn(1, 120)[0]/100.,
-            index=pd.date_range('2000-1-30', periods=120, freq='M'))
+            index=pd.date_range('2000-1-30', periods=120, freq='ME'))
 
         self.factor_returns = pd.Series(
             rand.randn(1, 120)[0]/100.,
-            index=pd.date_range('2000-1-30', periods=120, freq='M'))
+            index=pd.date_range('2000-1-30', periods=120, freq='ME'))
 
     def test_roll_pandas(self):
         res = emutils.roll(self.returns,
