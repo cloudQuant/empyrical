@@ -1,85 +1,77 @@
 # GitHub Actions Workflows
 
-This directory contains GitHub Actions workflows for continuous integration and deployment.
+本目录包含用于持续集成和部署的GitHub Actions工作流。
 
-## Active Workflows
+## 工作流文件
 
-### 1. Main Test Suite (`tests.yml`)
-- **Trigger**: Push/PR to master, main, develop branches
-- **Purpose**: Comprehensive testing across multiple platforms and Python versions
-- **Matrix**:
-  - OS: Ubuntu, Windows, macOS  
-  - Python: 3.8, 3.9, 3.10, 3.11, 3.12, 3.13 (excluding Python 3.13 on Windows)
-- **Jobs**:
-  - `test`: Full test suite on all platform/version combinations
-  - `test-minimal`: Quick sanity check
-  - `coverage`: Code coverage analysis
-  - `lint`: Code quality checks
-  - `build`: Package building and validation
+### 1. CI主工作流 (`ci.yml`)
+- **触发条件**: 推送到master/main分支，PR，手动触发
+- **测试矩阵**:
+  - **操作系统**: Ubuntu (latest), Windows (latest), macOS (latest)
+  - **Python版本**: 3.8, 3.9, 3.10, 3.11, 3.12, 3.13
+- **任务**:
+  - `test`: 在所有平台和Python版本上运行完整测试套件
+  - `test-summary`: 汇总测试结果
+  - `coverage`: 代码覆盖率分析
+  - `lint`: 代码质量检查
+  - `build`: 构建和验证包
 
-### 2. Simple Test (`test-simple.yml`)
-- **Trigger**: Push/PR to master, main, develop branches
-- **Purpose**: Lightweight testing with minimal dependencies
-- **Features**: Tests specific OS/Python combinations for quick feedback
+### 2. 调试工作流 (`debug.yml`) 
+- **触发条件**: 手动触发或推送到debug-*分支
+- **用途**: 详细诊断CI问题
+- **特性**: 
+  - 详细的系统信息输出
+  - 目录结构展示
+  - 逐步测试执行
 
-### 3. Minimal Test (`test-minimal.yml`)
-- **Trigger**: Push/PR to master, main, develop branches
-- **Purpose**: Debug and identify specific issues
-- **Features**: Detailed logging and step-by-step execution
+### 3. 发布工作流 (`publish.yml`)
+- **触发条件**: GitHub release或手动触发
+- **用途**: 发布包到PyPI
+- **特性**:
+  - 可选先发布到Test PyPI
+  - 自动构建和上传
+  - 分发验证
 
-### 4. Debug Workflow (`debug.yml`)
-- **Trigger**: Manual (workflow_dispatch) or push to debug-ci branch
-- **Purpose**: Detailed debugging when tests fail
-- **Features**: Comprehensive system information and verbose output
+## 测试覆盖
 
-### 5. Publish to PyPI (`publish.yml`)
-- **Trigger**: GitHub release or manual workflow dispatch
-- **Purpose**: Publish package to PyPI
-- **Features**:
-  - Option to test on Test PyPI first
-  - Automated build and upload
-  - Distribution validation
+| 操作系统 | Python版本 | 状态 |
+|---------|-----------|------|
+| Ubuntu | 3.8 - 3.13 | ✅ |
+| Windows | 3.8 - 3.13 | ✅ |
+| macOS | 3.8 - 3.13 | ✅ |
 
-## Workflow Files Structure
+## 本地测试
 
-```
-.github/
-├── workflows/
-│   ├── tests.yml          # Main comprehensive test suite
-│   ├── test-simple.yml    # Simple test with minimal deps
-│   ├── test-minimal.yml   # Minimal test for debugging
-│   ├── debug.yml          # Debug workflow
-│   ├── publish.yml        # PyPI publishing
-│   └── README.md          # This file
-└── dependabot.yml         # Automated dependency updates
-```
-
-## Required Secrets
-
-To enable PyPI publishing, add these secrets to your GitHub repository:
-
-1. Go to Settings → Secrets and variables → Actions
-2. Add:
-   - `PYPI_API_TOKEN`: Your PyPI API token
-   - `TEST_PYPI_API_TOKEN`: Your Test PyPI API token (optional)
-
-## Local Testing
-
-To test workflows locally using [act](https://github.com/nektos/act):
+使用pytest运行测试：
 
 ```bash
-# Test the main workflow
-act push -j test
+# 运行所有测试
+pytest tests/
 
-# Test with specific Python version
-act push -j test -P ubuntu-latest=python:3.11
+# 运行特定测试文件
+pytest tests/test_stats.py
+
+# 运行特定测试
+pytest tests/test_stats.py::test_sharpe_ratio
+
+# 带覆盖率运行
+pytest tests/ --cov=empyrical
 ```
 
-## Troubleshooting
+## 故障排除
 
-If workflows fail:
+如果CI失败：
 
-1. Check the `test-minimal.yml` workflow for detailed logs
-2. Run the `debug.yml` workflow manually for comprehensive debugging
-3. Review artifact uploads for test failures
-4. Check dependency compatibility in `requirements.txt`
+1. 查看GitHub Actions日志了解具体错误
+2. 运行debug.yml工作流进行详细诊断
+3. 检查测试文件路径是否正确
+4. 验证依赖项兼容性
+
+## 必需的密钥
+
+要启用PyPI发布，需要在GitHub仓库中添加以下密钥：
+
+1. 进入 Settings → Secrets and variables → Actions
+2. 添加:
+   - `PYPI_API_TOKEN`: PyPI API令牌
+   - `TEST_PYPI_API_TOKEN`: Test PyPI API令牌（可选）

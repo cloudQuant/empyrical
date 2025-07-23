@@ -1,75 +1,82 @@
-name: Debug Tests
+name: Debug CI
 
 on:
   workflow_dispatch:
   push:
-    branches: [ debug-ci ]
+    branches: [ debug-* ]
 
 jobs:
-  debug-test:
-    name: Debug Test - ${{ matrix.os }} - Python ${{ matrix.python-version }}
+  debug:
+    name: Debug on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
-        python-version: ['3.11']
+        os: [ubuntu-latest, windows-latest, macos-latest]
         
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python 3.11
       uses: actions/setup-python@v5
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: '3.11'
         
-    - name: System information
+    - name: System info
       run: |
         echo "=== System Information ==="
+        echo "OS: ${{ matrix.os }}"
         python --version
-        pip --version
-        echo "=== Working Directory ==="
-        pwd
-        echo "=== Directory Contents ==="
+        python -m pip --version
+        
+    - name: Show directory structure
+      run: |
+        echo "=== Repository Structure ==="
         ls -la
-        echo "=== Test Directory ==="
-        ls -la tests/ || echo "tests/ directory not found"
-        echo "=== Package Directory ==="
-        ls -la empyrical/ || echo "empyrical/ directory not found"
+        echo ""
+        echo "=== Tests Directory ==="
+        ls -la tests/
+        echo ""
+        echo "=== Empyrical Package ==="
+        ls -la empyrical/
         
     - name: Install minimal dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install numpy pandas scipy pytest
+        python -m pip install numpy pandas scipy pytest
         
     - name: Install package
       run: |
-        pip install -e .
-        echo "=== Installed Packages ==="
-        pip list
+        echo "=== Installing empyrical ==="
+        python -m pip install -e .
+        echo ""
+        echo "=== Installed packages ==="
+        python -m pip list
         
-    - name: Test import
+    - name: Test imports
       run: |
-        echo "=== Testing Import ==="
-        python -c "import empyrical; print('Successfully imported empyrical')"
-        python -c "import empyrical; print(f'Version: {empyrical.__version__}')"
-        python -c "import empyrical; print(f'Available functions: {dir(empyrical)[:10]}...')"
+        echo "=== Testing imports ==="
+        python -c "import sys; print('Python path:', sys.path)"
+        python -c "import empyrical; print('Empyrical location:', empyrical.__file__)"
+        python -c "from empyrical import sharpe_ratio; print('sharpe_ratio imported')"
         
     - name: Find test files
       run: |
-        echo "=== Finding Test Files ==="
-        find . -name "test_*.py" -type f | head -20
-        echo "=== Pytest Collection ==="
-        python -m pytest --collect-only tests/ || echo "pytest collection failed"
+        echo "=== Finding test files ==="
+        find . -name "test_*.py" -type f || echo "No test files found with find"
+        echo ""
+        echo "=== Pytest collection ==="
+        python -m pytest --collect-only tests/
         
-    - name: Run single test
+    - name: Run single test verbose
       run: |
-        echo "=== Running Single Test ==="
-        python -m pytest tests/test_stats.py::test_sharpe_ratio -v || echo "Single test failed"
+        echo "=== Running single test ==="
+        python -m pytest tests/test_stats.py::test_sharpe_ratio -vvs
+      continue-on-error: true
         
-    - name: Run all tests with verbose output
+    - name: List all available tests
       run: |
-        echo "=== Running All Tests ==="
-        python -m pytest tests/ -v -s --tb=long || echo "Tests failed with exit code $?"
+        echo "=== All available tests ==="
+        python -m pytest tests/ --collect-only -q
