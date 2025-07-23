@@ -50,7 +50,7 @@ classifiers = [
 if __name__ == "__main__":
     setup(
         name=DISTNAME,
-        version="0.5.6",
+        version="0.6.0",
         maintainer=MAINTAINER,
         maintainer_email=MAINTAINER_EMAIL,
         description=DESCRIPTION,
