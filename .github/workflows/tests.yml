@@ -56,6 +56,7 @@ jobs:
         pip install pytest
         pip install pytest-xdist
         pip install pytest-cov
+        pip install parameterized
         
         # Install optional dependencies
         pip install pandas-datareader || echo "pandas-datareader installation failed, continuing..."
@@ -114,7 +115,7 @@ jobs:
     - name: Install core dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install numpy pandas scipy pytest six
+        pip install numpy pandas scipy pytest six parameterized
         
     - name: Install package
       run: |
@@ -153,7 +154,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install numpy pandas scipy pytest pytest-cov six
+        pip install numpy pandas scipy pytest pytest-cov six parameterized
         pip install -e .
         
     - name: Run tests with coverage
